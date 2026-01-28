@@ -518,36 +518,19 @@ max-height:160px;overflow-y:auto;
 <section class="panel" id="viewInfo">
   <b>Информация</b>
 
-  <!-- ✅ ИЗМЕНЕНО: версия -->
-  <div style="margin-top:12px;font-weight:800">Версия 1.2.0</div>
+  <div style="margin-top:12px;font-weight:800" id="infoVersionLine">Версия 1.2.1</div>
 
-  <!-- ✅ ИЗМЕНЕНО: что нового 1.2.0 -->
-  <div style="margin-top:12px;font-weight:800">Что нового — 1.2.0</div>
-  <div style="font-size:12px;opacity:.6;margin:6px 0 8px">21 января 2026</div>
-  <ul style="margin:0;padding-left:18px">
-    <li>Изменение интерфейса</li>
+  <div style="margin-top:12px;font-weight:800" id="infoWhatsNewTitle">Что нового — 1.2.1</div>
+  <div style="font-size:12px;opacity:.6;margin:6px 0 8px" id="infoWhatsNewDate">27 января 2026</div>
+  <ul style="margin:0;padding-left:18px" id="infoWhatsNewList">
+    <li>Исправлен перевод всех текстов</li>
   </ul>
 
   <button style="margin-top:10px" type="button" id="btnOld">
     Старые обновления
   </button>
 
-  <!-- ✅ ИЗМЕНЕНО: в старые обновления перенесены все пункты 1.1.0 + дата -->
-  <div class="old" id="old" style="display:none">
-    <b>1.1.0</b><br>
-    <span style="opacity:.7;font-size:12px">5 января 2026</span><br>
-    • Режим тишины<br>
-    • Смена настроения фона<br>
-    • Выбор подсветки<br>
-    • Режим фото<br>
-    • Настроение дня<br>
-    • 🛠 Календарь ушёл на переработку<br>
-    <br>
-    <b>1.0.1</b><br>
-    • Календарь<br>
-    • Языки<br>
-    • Поделиться
-  </div>
+  <div class="old" id="old" style="display:none"></div>
 
   <div style="margin-top:14px;border-top:1px solid #ddd;padding-top:12px">
     <div class="call">
@@ -619,6 +602,11 @@ const btnShare = document.getElementById('btnShare');
 const btnOld = document.getElementById('btnOld');
 const oldBox = document.getElementById('old');
 
+const infoVersionLine = document.getElementById('infoVersionLine');
+const infoWhatsNewTitle = document.getElementById('infoWhatsNewTitle');
+const infoWhatsNewDate = document.getElementById('infoWhatsNewDate');
+const infoWhatsNewList = document.getElementById('infoWhatsNewList');
+
 /* ===== СНЕГ ===== */
 for(let i=0;i<90;i++){
   const s=document.createElement('span');
@@ -638,22 +626,180 @@ function tick(){
 }
 setInterval(tick,1000);tick();
 
-/* ===== ЯЗЫК ===== */
-const texts={
-  ru:{title:'До Нового года',d:'дней',h:'часов',m:'мин',s:'сек',support:'Хотите свой регион или декор? Пишите!'},
-  en:{title:'Until New Year',d:'days',h:'hours',m:'min',s:'sec',support:'Want your region or decor? Message me!'}
+/* ===== ПЕРЕВОД ВСЕГО ===== */
+let currentLang = 'ru';
+
+const i18n = {
+  ru:{
+    title:'До Нового года',
+    units:{d:'дней',h:'часов',m:'мин',s:'сек'},
+    support:'Хотите свой регион или декор? Пишите!',
+    menu:{lang:'Язык',share:'Поделиться',copy:'Скопировать ссылку'},
+    tabs:{timer:'Таймер',settings:'Настройки',info:'Инфо'},
+    settings:{
+      title:'Настройки',
+      glow:'Подсветка',
+      silent:'Режим тишины',
+      bg:'Смена настроения фона',
+      photo:'Режим фото',
+      mood:'Настроение дня',
+      glowColor:'Цвет подсветки'
+    },
+    info:{
+      title:'Информация',
+      version:'Версия 1.2.1',
+      newTitle:'Что нового — 1.2.1',
+      newDate:'27 января 2026',
+      newList:['Исправлен перевод всех текстов'],
+      oldBtn:'Старые обновления',
+      oldHtml:
+        `<b>1.2.0</b><br>
+         <span style="opacity:.7;font-size:12px">21 января 2026</span><br>
+         • Изменение интерфейса<br><br>
+         <b>1.1.0</b><br>
+         <span style="opacity:.7;font-size:12px">5 января 2026</span><br>
+         • Режим тишины<br>
+         • Смена настроения фона<br>
+         • Выбор подсветки<br>
+         • Режим фото<br>
+         • Настроение дня<br>
+         • 🛠 Календарь ушёл на переработку<br><br>
+         <b>1.0.1</b><br>
+         • Календарь<br>
+         • Языки<br>
+         • Поделиться`
+    },
+    share:{
+      shareText:'До Нового года!',
+      copied:'Ссылка скопирована!'
+    },
+    counters:(weekend,work)=>`📆 До НГ:<br>• 🏖 Выходных: ${weekend}<br>• 💼 Рабочих: ${work}`,
+    moods:[
+      '🎄 Отличный день для праздника',
+      '❄️ Тихий зимний день',
+      '✨ Самое время загадывать желания',
+      '🔔 Новый год уже совсем близко',
+      '☕ Спокойный день без спешки'
+    ]
+  },
+  en:{
+    title:'Until New Year',
+    units:{d:'days',h:'hours',m:'min',s:'sec'},
+    support:'Want your region or decor? Message me!',
+    menu:{lang:'Language',share:'Share',copy:'Copy link'},
+    tabs:{timer:'Timer',settings:'Settings',info:'Info'},
+    settings:{
+      title:'Settings',
+      glow:'Glow',
+      silent:'Silent mode',
+      bg:'Background mood',
+      photo:'Photo mode',
+      mood:'Mood of the day',
+      glowColor:'Glow color'
+    },
+    info:{
+      title:'Information',
+      version:'Version 1.2.1',
+      newTitle:'What’s new — 1.2.1',
+      newDate:'January 27, 2026',
+      newList:['Fixed translation across the entire app'],
+      oldBtn:'Older updates',
+      oldHtml:
+        `<b>1.2.0</b><br>
+         <span style="opacity:.7;font-size:12px">January 21, 2026</span><br>
+         • UI changes<br><br>
+         <b>1.1.0</b><br>
+         <span style="opacity:.7;font-size:12px">January 5, 2026</span><br>
+         • Silent mode<br>
+         • Background mood<br>
+         • Glow selection<br>
+         • Photo mode<br>
+         • Mood of the day<br>
+         • 🛠 Calendar is being reworked<br><br>
+         <b>1.0.1</b><br>
+         • Calendar<br>
+         • Languages<br>
+         • Share`
+    },
+    share:{
+      shareText:'Until New Year!',
+      copied:'Link copied!'
+    },
+    counters:(weekend,work)=>`📆 Until NY:<br>• 🏖 Weekends: ${weekend}<br>• 💼 Workdays: ${work}`,
+    moods:[
+      '🎄 Perfect day to celebrate',
+      '❄️ Calm winter day',
+      '✨ Time to make a wish',
+      '🔔 New Year is very close',
+      '☕ A chill day, no rush'
+    ]
+  }
 };
+
+function applyTranslations(){
+  const t = i18n[currentLang];
+
+  // title + units
+  elTitle.textContent = t.title;
+  elLd.textContent = t.units.d;
+  elLh.textContent = t.units.h;
+  elLm.textContent = t.units.m;
+  elLs.textContent = t.units.s;
+
+  // support
+  elSupportText.textContent = t.support;
+
+  // circle menus
+  langBtn.querySelector('.menu-title').textContent = t.menu.lang;
+  shareBtn.querySelector('.menu-title').textContent = t.menu.share;
+  btnShare.textContent = t.menu.copy;
+
+  // tab labels
+  const tabLabels = document.querySelectorAll('.tabbar .tab .label');
+  if(tabLabels[0]) tabLabels[0].textContent = t.tabs.timer;
+  if(tabLabels[1]) tabLabels[1].textContent = t.tabs.settings;
+  if(tabLabels[2]) tabLabels[2].textContent = t.tabs.info;
+
+  // settings panel texts (без добавления id — просто по порядку)
+  const settingsB = viewSettings.querySelector('b');
+  if(settingsB) settingsB.textContent = t.settings.title;
+
+  const settingSpans = viewSettings.querySelectorAll('.setting span');
+  if(settingSpans[0]) settingSpans[0].textContent = t.settings.glow;
+  if(settingSpans[1]) settingSpans[1].textContent = t.settings.silent;
+  if(settingSpans[2]) settingSpans[2].textContent = t.settings.bg;
+  if(settingSpans[3]) settingSpans[3].textContent = t.settings.photo;
+  if(settingSpans[4]) settingSpans[4].textContent = t.settings.mood;
+
+  const glowColorB = viewSettings.querySelector('b[style*="margin-top:14px"]');
+  if(glowColorB) glowColorB.textContent = t.settings.glowColor;
+
+  // info panel texts
+  const infoB = viewInfo.querySelector('b');
+  if(infoB) infoB.textContent = t.info.title;
+
+  infoVersionLine.textContent = t.info.version;
+  infoWhatsNewTitle.textContent = t.info.newTitle;
+  infoWhatsNewDate.textContent = t.info.newDate;
+
+  infoWhatsNewList.innerHTML = t.info.newList.map(x=>`<li>${x}</li>`).join('');
+
+  btnOld.textContent = t.info.oldBtn;
+  oldBox.innerHTML = t.info.oldHtml;
+
+  // refresh mood/counters with new language
+  updateMood();
+  updateCounters();
+}
+
+/* ===== ЯЗЫК ===== */
 function closeCircleMenus(){
   langBtn.classList.remove('open');
   shareBtn.classList.remove('open');
 }
 function setLang(l){
-  elTitle.textContent=texts[l].title;
-  elLd.textContent=texts[l].d;
-  elLh.textContent=texts[l].h;
-  elLm.textContent=texts[l].m;
-  elLs.textContent=texts[l].s;
-  elSupportText.textContent=texts[l].support;
+  currentLang = l;
+  applyTranslations();
   closeCircleMenus();
 }
 setLang('ru');
@@ -674,13 +820,14 @@ btnEn.addEventListener('click', ()=>setLang('en'));
 
 /* ===== SHARE ===== */
 function share(){
+  const t = i18n[currentLang];
   if (navigator.share){
-    navigator.share({text:'До Нового года!',url:location.href}).catch(()=>{});
+    navigator.share({text: t.share.shareText, url: location.href}).catch(()=>{});
   } else {
     if (navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(location.href).catch(()=>{});
     }
-    alert('Ссылка скопирована!');
+    alert(t.share.copied);
   }
   closeCircleMenus();
 }
@@ -720,16 +867,10 @@ palette.forEach(c=>{
 });
 
 /* ===== НАСТРОЕНИЕ ===== */
-const moods=[
-  '🎄 Отличный день для праздника',
-  '❄️ Тихий зимний день',
-  '✨ Самое время загадывать желания',
-  '🔔 Новый год уже совсем близко',
-  '☕ Спокойный день без спешки'
-];
 function updateMood(){
   if(!moodToggle.classList.contains('on')){elMoodText.textContent='';return;}
-  elMoodText.textContent=moods[new Date().getDate()%moods.length];
+  const arr = i18n[currentLang].moods;
+  elMoodText.textContent = arr[new Date().getDate()%arr.length];
 }
 moodToggle.onclick=()=>{moodToggle.classList.toggle('on');updateMood();};
 updateMood();
@@ -742,7 +883,7 @@ function updateCounters(){
   for(let dd=new Date(now); dd<end; dd.setDate(dd.getDate()+1)){
     (dd.getDay()==0||dd.getDay()==6)?weekend++:work++;
   }
-  elCounters.innerHTML=`📆 До НГ:<br>• 🏖 Выходных: ${weekend}<br>• 💼 Рабочих: ${work}`;
+  elCounters.innerHTML = i18n[currentLang].counters(weekend, work);
 }
 updateCounters();
 
